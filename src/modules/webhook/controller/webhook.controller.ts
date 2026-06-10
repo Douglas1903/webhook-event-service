@@ -20,12 +20,13 @@ export class WebhookController {
   async receiveWebhook(
     @Param('source') source: string,
     @Body() body: CreateWebhookDto,
-    @Headers() headers: Record<string, unknown>,
+    @Headers() headers: Record<string, string>,
   ) {
     return this.webhookService.createEvent({
       source,
       payload: body.payload,
       headers,
+      eventType: body.eventType,
     });
   }
 }

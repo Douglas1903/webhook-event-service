@@ -9,14 +9,17 @@ export class WebhookService {
 
   constructor(
     private readonly webhookRepository: WebhookRepository,
-  ) {}
+  ) { }
 
   async createEvent(data: CreateWebhookEvent) {
     this.logger.log(
-      `Received webhook source=${data.source} eventType=${data.eventType ?? 'unknown'}`,
+      `Received webhook source=${data.source} eventType=${data.eventType ?? 'not-provided'}`,
     );
 
-    const result = await this.webhookRepository.create(data);
+    const result = await this.webhookRepository.create({
+      ...data,
+      status: data.status ?? 'success',
+    });
 
     this.logger.log(
       `Persisted webhook id=${result.id} source=${result.source}`,
@@ -27,6 +30,8 @@ export class WebhookService {
       id: result.id,
       source: result.source,
       eventType: result.eventType,
+      status: result.status,
+      errorMessage: result.errorMessage,
       createdAt: result.createdAt,
     };
   }

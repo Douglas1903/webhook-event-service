@@ -3,4 +3,6 @@ export type CreateWebhookEvent = {
   eventType?: string;
   payload: Record<string, unknown>;
   headers?: Record<string, unknown>;
+  status?: 'success' | 'error';
+  errorMessage?: string;
 };

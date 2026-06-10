@@ -36,6 +36,18 @@ export class WebhookEvent {
         required: false,
     })
     headers?: Record<string, unknown>;
+
+    @Prop({
+        required: true,
+        default: 'success',
+    })
+    status!: 'success' | 'error';
+
+    @Prop({
+        required: false,
+    })
+    errorMessage?: string;
+
 }
 
 export const WebhookEventSchema =

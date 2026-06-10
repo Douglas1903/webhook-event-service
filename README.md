@@ -39,14 +39,9 @@ The application is designed to accept payloads from different providers without 
 │   ├── types/
 │   └── utils/
 │
-├── config/
-│   └── env/
-│       └── configuration.ts
-│
-├── database/
-│   └── database.module.ts
-│
 ├── modules/
+│   ├── database/
+│   │   └── database.module.ts
 │   ├── health/
 │   │   ├── controller/
 │   │   │   └── health.controller.ts

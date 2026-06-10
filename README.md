@@ -1,98 +1,336 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Webhook Ingestion Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A backend service built with **NestJS**, **TypeScript**, and **MongoDB** for receiving and persisting webhook events in a generic and scalable way.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The application is designed to accept payloads from different providers without requiring a predefined schema for the webhook content, making it flexible enough to support multiple integrations through a single endpoint.
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* Generic webhook ingestion
+* Dynamic `source` parameter support
+* Flexible payload persistence
+* MongoDB integration with Mongoose
+* Input validation using `class-validator`
+* Global exception handling
+* Structured error responses
+* Health check endpoint
+* Environment-based configuration
+* Clean and modular architecture
 
-## Project setup
+## Tech Stack
 
-```bash
-$ npm install
+* Node.js
+* TypeScript
+* NestJS
+* MongoDB
+* Mongoose
+* Docker
+* Docker Compose
+* class-validator
+* class-transformer
+
+## Project Structure
+
+```src/
+│
+├── common/
+│   ├── filters/
+│   │   └── http-exception.filter.ts
+│   ├── types/
+│   └── utils/
+│
+├── config/
+│   └── env/
+│       └── configuration.ts
+│
+├── database/
+│   └── database.module.ts
+│
+├── modules/
+│   ├── health/
+│   │   ├── controller/
+│   │   │   └── health.controller.ts
+│   │   ├── service/
+│   │   │   └── health.service.ts
+│   │   └── health.module.ts
+│   │
+│   └── webhook/
+│       ├── controller/
+│       │   └── webhook.controller.ts
+│       ├── dto/
+│       │   └── create-webhook.dto.ts
+│       ├── enums/
+│       ├── repository/
+│       │   └── webhook.repository.ts
+│       ├── schema/
+│       │   └── webhook-event.schema.ts
+│       ├── service/
+│       │   └── webhook.service.ts
+│       ├── types/
+│       │   └── create-webhook-event.type.ts
+│       └── webhook.module.ts
+│
+├── app.module.ts
+└── main.ts
 ```
 
-## Compile and run the project
+## Architecture
 
-```bash
-# development
-$ npm run start
+The project follows a layered architecture with clearly separated responsibilities.
 
-# watch mode
-$ npm run start:dev
+### Controller
 
-# production mode
-$ npm run start:prod
+* Receives HTTP requests
+* Validates incoming data
+* Delegates business logic to the service layer
+
+### Service
+
+* Encapsulates business rules
+* Coordinates application flow
+* Delegates persistence operations to the repository
+
+### Repository
+
+* Responsible for database interaction
+* Persists webhook events using Mongoose
+
+### Global Exception Filter
+
+* Centralizes exception handling
+* Produces standardized error responses
+* Logs unexpected failures
+
+## Prerequisites
+
+Before running the project, make sure you have installed:
+
+* Node.js
+* npm
+* Docker
+* Docker Compose
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root.
+
+Example:
+
+```env
+PORT=3000
+
+MONGODB_URI=mongodb://admin:admin@localhost:27017/webhook-events?authSource=admin
 ```
 
-## Run tests
+Alternatively, copy the example file:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+and adjust the values according to your local environment.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Installation
+
+Install the project dependencies:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Running MongoDB with Docker
 
-Check out a few resources that may come in handy when working with NestJS:
+Start the database using Docker Compose:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+docker compose up -d
+```
 
-## Support
+To stop the containers:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+docker compose down
+```
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Running the Application
+
+Development mode:
+
+```bash
+npm run start:dev
+```
+
+Production mode:
+
+```bash
+npm run build
+npm run start:prod
+```
+
+The application will be available at:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## Health Check
+
+Health endpoint:
+
+```http
+GET /health
+```
+
+Example response:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## Configuration Notes
+
+The application uses environment variables for configuration and connects to MongoDB through Mongoose.
+
+Database persistence is handled through a dedicated repository layer, keeping business logic separated from persistence concerns and making the project easier to maintain and extend.
+
+## API
+
+### Receive Webhook
+
+Persists a webhook event received from any external source system.
+
+**Endpoint**
+
+```http
+POST /webhooks/:source
+```
+
+| Parameter | Type     | Description                        |
+| --------- | -------- | ---------------------------------- |
+| `source`  | `string` | Identifier of the webhook provider |
+
+### Request Body
+
+Since this service is designed to be generic, the application does **not** enforce a predefined schema for the webhook payload.
+
+The request body must contain a single field: `payload`, which must be a valid JSON object.
+
+Example:
+
+```json
+{
+  "payload": {
+    "event": "example.event",
+    ...
+  }
+}
+```
+
+Any valid object can be sent inside `payload` and will be persisted.
+
+---
+
+## Validation
+
+The application validates the incoming request to ensure that:
+
+* `payload` exists in the request body
+* `payload` is a valid JSON object
+
+No validation is performed on the internal structure of the `payload`, allowing integration with different webhook providers without requiring schema changes.
+
+---
+
+## Error Handling
+
+The project uses a global exception filter to provide standardized error responses.
+
+Example:
+
+```json
+{
+  "statusCode": 400,
+  "timestamp": "2026-06-10T15:30:00.000Z",
+  "path": "/webhooks/github",
+  "method": "POST",
+  "message": [
+    "payload must be an object"
+  ]
+}
+```
+
+Unexpected internal errors are logged while avoiding the exposure of implementation details to API consumers.
+
+---
+
+## Testing
+
+Run unit tests:
+
+```bash
+npm run test
+```
+
+Run end-to-end tests:
+
+```bash
+npm run test:e2e
+```
+
+Generate coverage report:
+
+```bash
+npm run test:cov
+```
+
+---
+
+## Design Decisions
+
+Some architectural decisions adopted in this project include:
+
+* Layered architecture (Controller → Service → Repository) to ensure clear separation of concerns
+* Generic webhook ingestion model designed to accept events from multiple providers without schema coupling
+* Lightweight event structure with minimal enforced fields (`source`, `payload`) to maximize flexibility
+* Optional `eventType` extraction to improve observability and enable basic event categorization
+* Optional `headers` persistence to support traceability and debugging when provided by the source system
+* Separation between business logic and persistence to keep the service maintainable and testable
+* Centralized exception handling for consistent API error responses
+* Environment-based configuration for deployment flexibility
+* Modular project structure to support future scalability and feature expansion
+
+---
+
+## Future Improvements
+
+Potential enhancements include:
+
+* Automated unit tests
+* End-to-end test coverage
+* Payload size limits
+* Authentication and request signature validation
+* Idempotency support
+* Rate limiting
+* Metrics and observability
+* Retry and dead-letter queue mechanisms
+* Event streaming integration
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is available under the MIT License.
